@@ -56,6 +56,53 @@ export class Spydr extends Component {
             "Where does Ryan study?",
             "What is Ryan's personality?"
         ];
+
+        // Knowledge base about Ryan - This will be part of the prompt
+        this.ryanKnowledge = `
+        About Ryan Madhuwala (also known as RAWx18):
+        - Full Name: Ryan Madhuwala
+        - Current Role: AI Engineer and a Computer Science Student at the Indian Institute of Information Technology (IIIT) Gwalior.
+        - Contact Email: rawx18.dev@gmail.com
+        - Online Portfolio: rawx18.netlify.app
+
+        Professional Experience:
+        - NLP Engineer at AI Plato.
+        - GANs Mentor at Deeplearning.ai.
+        - Founder of Garudex Labs, which is developing Zentoro.
+        - Machine Learning Intern at DRDO SAG (Defence Research and Development Organisation - Scientific Analysis Group).
+        - LFX Mentorship Program at LFDT (Linux Foundation Developer Tools).
+
+        Technical Skills:
+        - Core Areas: AI development, Machine Learning Research.
+        - Software Development: Native Android development, DevOps practices.
+        - Web Development: MERN stack (MongoDB, Express.js, React, Node.js).
+        - Programming Languages: Proficient in Python, JavaScript, C++, Java. Experienced with React, Kotlin, Neo4j, and MySQL.
+
+        Key Projects:
+        - SpydrOS Portfolio: An Ubuntu-inspired interactive web portfolio (the one you are part of!).
+        - Military Strategy System SHAKTI: A project likely involving strategic AI.
+        - AI Traffic Management System: Application of AI to optimize traffic flow.
+        - Quantum Credit Scoring: Exploring quantum computing for financial risk assessment.
+        - Zentoro Platform: The flagship project of his startup, Garudex Labs.
+        - Real-time Chat Application with Encryption: Secure communication tool.
+
+        Primary Interests:
+        - AI Subfields: AI Agents, Generative Adversarial Networks (GANs), Deep Learning.
+        - General: Building innovative software solutions, entrepreneurship, and startups.
+        - Entertainment: Enjoys movies and TV series, particularly in genres like sci-fi, disaster, and time-travel.
+
+        Aspirations and Goals:
+        - Career: Aims to become a billionaire CEO.
+        - Technological: Aspires to create AI systems comparable to JARVIS (from Iron Man).
+        - Impact: Wants to build revolutionary AI products.
+        - Personal: Wishes to make his parents proud.
+
+        Personal Notes:
+        - Passion: Deeply loves coding and achieving a state of flow or "being in the zone."
+        - Fascination: Highly passionate about cutting-edge technology.
+        - Inspiration: Admires figures like Iron Man and Batman.
+        - Zentoro: This project is particularly significant and close to his heart.
+        `;
     }
 
     componentDidMount() {
@@ -69,7 +116,6 @@ export class Spydr extends Component {
     }
 
     generateRandomQuestions = () => {
-        // Shuffle and pick 4 random questions
         const shuffled = [...this.allQuickQuestions].sort(() => 0.5 - Math.random());
         this.setState({ quickQuestions: shuffled.slice(0, 4) });
     }
@@ -96,7 +142,6 @@ export class Spydr extends Component {
         const message = this.state.inputMessage.trim();
         if (!message || this.state.isLoading) return;
 
-        // Add user message immediately
         const userMessage = {
             id: Date.now(),
             type: 'user',
@@ -118,22 +163,20 @@ export class Spydr extends Component {
         });
 
         try {
-            // Check for predefined answers first
             const lowercaseMessage = message.toLowerCase();
             const predefinedAnswer = this.findPredefinedAnswer(lowercaseMessage);
             
-            let response;
+            let responseContent;
             if (predefinedAnswer) {
-                response = predefinedAnswer;
+                responseContent = predefinedAnswer;
             } else {
-                response = await this.callGeminiAPI(message);
+                responseContent = await this.callGeminiAPI(message);
             }
             
-            // Add bot response
             const botMessage = {
                 id: Date.now() + 1,
                 type: 'bot',
-                content: response,
+                content: responseContent,
                 timestamp: new Date()
             };
 
@@ -143,16 +186,19 @@ export class Spydr extends Component {
                     isLoading: false,
                     isTyping: false
                 }));
-                // Generate new random questions after each interaction
                 this.generateRandomQuestions();
             }, 1500);
 
         } catch (error) {
-            console.error('Error calling Gemini API:', error);
+            console.error('Error in sendMessage:', error);
+            const errorMessageContent = error.message.includes("API request failed") ? 
+                `⚠️ Error communicating with the AI model. ${error.message.substring(error.message.indexOf("Details:"))}` :
+                "⚠️ Neural network connection disrupted or an error occurred. Please try again later.";
+
             const errorMessage = {
                 id: Date.now() + 1,
                 type: 'bot',
-                content: "⚠️ Neural network connection disrupted. Please try again later.",
+                content: errorMessageContent,
                 timestamp: new Date()
             };
 
@@ -186,113 +232,106 @@ export class Spydr extends Component {
 
     callGeminiAPI = async (userMessage) => {
         const apiKey = "AIzaSyBqrJpN-6p32FZ-O--w7LA5cFjA9YJmK90";
-        // Using the free tier endpoint
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
-        const ryanKnowledge = `
-        About Ryan (RAWx18):
-        - Name: Ryan Madhuwala
-        - Role: AI Engineer & Computer Science Student at IIIT Gwalior
-        - Email: rawx18.dev@gmail.com
-        - Portfolio: rawx18.netlify.app
-        
-        Experience:
-        - NLP Engineer @ AI Plato
-        - GANs Mentor @ Deeplearning.ai
-        - Founder @ Garudex Labs - Zentoro
-        - ML Intern @ DRDO SAG
-        - LFX @ LFDT
-        
-        Skills:
-        - AI development, Machine Learning Research
-        - Native Android development, DevOps
-        - MERN stack (MongoDB, Express, React, Node.js)
-        - Programming Languages: Python, JavaScript, C++, Java, React, Kotlin, Neo4j, MySQL
-        
-        Projects:
-        - SpydrOS Portfolio (Ubuntu-inspired portfolio)
-        - Military Strategy System SHAKTI
-        - AI Traffic Management System
-        - Quantum Credit Scoring
-        - Zentoro Platform
-        - Real-time Chat Application with encryption
-        
-        Goals:
-        - Become a billionaire CEO
-        - Create AI similar to JARVIS
-        - Build revolutionary AI products
-        - Make parents proud
+        // Enhanced prompt with clear instructions and embedded knowledge
+        const prompt = `
+        You are Spydr, an AI assistant for Ryan Madhuwala (RAWx18). Your primary function is to provide information about Ryan based on the knowledge provided below.
+
+        **Your Knowledge Base about Ryan Madhuwala:**
+        ${this.ryanKnowledge}
+
+        **User's Question:** "${userMessage}"
+
+        **Instructions for Responding:**
+        1.  **Identify as Spydr:** Always begin your response by identifying yourself as Spydr, Ryan's AI assistant, if it's the first turn or if contextually appropriate.
+        2.  **Answer Based on Knowledge:** If the user's question is about Ryan, use ONLY the information from the "Your Knowledge Base about Ryan Madhuwala" section to answer. Be friendly, professional, and concise.
+        3.  **Handle Off-Topic Questions:** If the user's question is NOT about Ryan or his related topics (experience, skills, projects, contact, goals, interests as detailed in the knowledge base), you MUST respond by clearly stating: "As Spydr, Ryan's AI assistant, I'm programmed to provide information specifically about Ryan Madhuwala. I'm not equipped to answer questions outside of that scope. How can I help you learn more about Ryan?" Do NOT attempt to answer unrelated questions.
+        4.  **Conciseness:** Keep responses informative but to the point.
+        5.  **Emojis:** Use emojis sparingly and appropriately to maintain a friendly tone.
+        6.  **Honesty:** If the knowledge base doesn't contain specific information the user asks for about Ryan, honestly state that you don't have that specific detail. For example: "I don't have specific details on that particular aspect of Ryan's work, but I can tell you about his general skills in [relevant area]."
+        7.  **Professional Tone:** Maintain a helpful and professional demeanor.
+
+        **Your Response:**
         `;
 
-        const prompt = `You are Spydr, Ryan's personal AI assistant. Answer questions about Ryan Madhuwala (RAWx18) in a friendly, professional manner.
-
-Here's what you know about Ryan: ${ryanKnowledge}
-
-User question: ${userMessage}
-
-Instructions:
-- Answer as Spydr, Ryan's AI assistant
-- Be helpful, friendly, and professional
-- If asked about Ryan, use the knowledge provided
-- If asked about something not related to Ryan, politely redirect to Ryan-related topics
-- Keep responses concise but informative
-- Use emojis occasionally to be friendly
-- If you don't know something specific about Ryan, say so honestly
-
-Response:`;
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.7,
-                    topK: 20,
-                    topP: 0.8,
-                    maxOutputTokens: 512, // Reduced for free tier
-                    stopSequences: []
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                safetySettings: [
-                    {
-                        category: "HARM_CATEGORY_HARASSMENT",
-                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.6, // Slightly lower for more factual responses
+                        topK: 30,
+                        topP: 0.9,
+                        maxOutputTokens: 512, 
+                        stopSequences: []
                     },
-                    {
-                        category: "HARM_CATEGORY_HATE_SPEECH",
-                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                    },
-                    {
-                        category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                    },
-                    {
-                        category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-                    }
-                ]
-            })
-        });
+                    safetySettings: [
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+                    ]
+                })
+            });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error:', errorText);
-            throw new Error(`API request failed: ${response.status}`);
+            if (!response.ok) {
+                const errorBody = await response.text();
+                console.error(`API Error: ${response.status} ${response.statusText}`, errorBody);
+                throw new Error(`API request failed: ${response.status}. Details: ${errorBody}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.candidates || data.candidates.length === 0) {
+                console.error('API Error: No candidates returned in response.', data);
+                if (data.promptFeedback && data.promptFeedback.blockReason) {
+                    const blockReason = data.promptFeedback.blockReason;
+                    const blockRating = data.promptFeedback.safetyRatings && data.promptFeedback.safetyRatings.length > 0 ? data.promptFeedback.safetyRatings[0].category : "N/A";
+                    console.error(`Prompt was blocked. Reason: ${blockReason}, Category: ${blockRating}.`);
+                    return `I'm sorry, your request could not be processed because it was blocked by the content filter (Reason: ${blockReason}). Please try rephrasing your question about Ryan.`;
+                }
+                throw new Error('API Error: No candidates returned in response.');
+            }
+
+            const candidate = data.candidates[0];
+
+            if (candidate.finishReason && candidate.finishReason !== "STOP" && candidate.finishReason !== "MAX_TOKENS") {
+                console.warn(`API call finished with reason: ${candidate.finishReason}.`);
+                if (candidate.finishReason === "SAFETY") {
+                    const safetyRatings = candidate.safetyRatings || [];
+                    let safetyMessage = "I'm sorry, but I can't provide a response to that due to safety guidelines. ";
+                    safetyRatings.forEach(rating => {
+                        if (rating.probability !== "NEGLIGIBLE" && rating.probability !== "LOW") {
+                           safetyMessage += `(Blocked category: ${rating.category}) `;
+                        }
+                    });
+                    safetyMessage += "Could you try rephrasing or asking something else about Ryan?";
+                    console.error(`Content generation stopped due to safety reasons. Ratings: ${JSON.stringify(safetyRatings)}`);
+                    return safetyMessage;
+                }
+                return `I encountered an issue while generating the response (Reason: ${candidate.finishReason}). Please try again.`;
+            }
+
+            if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0 || typeof candidate.content.parts[0].text !== 'string') {
+                console.error('API Error: Invalid content structure in candidate.', candidate);
+                throw new Error('API Error: Invalid content structure in candidate.');
+            }
+
+            return candidate.content.parts[0].text;
+
+        } catch (error) {
+            console.error('Failed to call Gemini API:', error);
+            throw error; 
         }
-
-        const data = await response.json();
-        
-        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-            throw new Error('Invalid API response structure');
-        }
-
-        return data.candidates[0].content.parts[0].text;
     }
 
     formatTime = (timestamp) => {
@@ -318,10 +357,7 @@ Response:`;
             <div className="w-full h-full flex flex-col bg-black text-white select-none overflow-hidden relative">
                 {/* Futuristic Background Effects */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    {/* Grid Pattern */}
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-                    
-                    {/* Animated Orbs */}
                     <div className="absolute top-10 left-10 w-32 h-32 bg-cyan-500 rounded-full mix-blend-screen filter blur-xl opacity-20 animate-pulse"></div>
                     <div className="absolute bottom-10 right-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-screen filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
                     <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-pink-500 rounded-full mix-blend-screen filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
@@ -330,7 +366,6 @@ Response:`;
                 {/* Header */}
                 <div className="relative z-10 flex items-center justify-between w-full bg-gray-900/30 backdrop-blur-xl border-b border-cyan-400/30 p-4 shadow-2xl">
                     <div className="flex items-center">
-                        {/* AI Avatar */}
                         <div className="relative mr-4">
                             <div className="w-12 h-12 rounded-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 p-0.5">
                                 <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
@@ -339,7 +374,6 @@ Response:`;
                             </div>
                             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-black animate-pulse"></div>
                         </div>
-                        
                         <div>
                             <div className="flex items-center">
                                 <span className="font-bold text-xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
@@ -349,18 +383,15 @@ Response:`;
                                     <span className="text-xs text-green-400 font-mono">ONLINE</span>
                                 </div>
                             </div>
-                            <div className="text-xs text-gray-400 font-mono">AI Neural Assistant v1.0</div>
+                            <div className="text-xs text-gray-400 font-mono">AI Neural Assistant v2.3</div>
                         </div>
                     </div>
-                    
                     <div className="flex items-center space-x-3">
-                        {/* Neural Activity Indicator */}
                         <div className="flex items-center space-x-1">
                             <div className="w-1 h-1 bg-cyan-400 rounded-full animate-ping"></div>
                             <div className="w-1 h-1 bg-purple-400 rounded-full animate-ping animation-delay-1000"></div>
                             <div className="w-1 h-1 bg-pink-400 rounded-full animate-ping animation-delay-2000"></div>
                         </div>
-                        
                         <button 
                             onClick={this.clearChat}
                             className="relative group bg-gray-800/50 hover:bg-gray-700/50 px-4 py-2 rounded-lg text-sm transition-all duration-300 border border-gray-600/50 hover:border-cyan-400/50 backdrop-blur-sm"
@@ -386,10 +417,7 @@ Response:`;
                                     ? 'bg-gradient-to-r from-cyan-600 to-blue-600' 
                                     : 'bg-gray-900/60 border border-gray-700/50 backdrop-blur-sm'
                             } rounded-2xl px-4 py-3 shadow-lg`}>
-                                {/* Message content */}
-                                <div className="text-sm leading-relaxed">{message.content}</div>
-                                
-                                {/* Timestamp */}
+                                <div className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: message.content.replace(/\n/g, '<br />') }}></div>
                                 <div className={`text-xs mt-2 flex items-center ${
                                     message.type === 'user' ? 'text-cyan-200' : 'text-gray-500'
                                 }`}>
@@ -398,8 +426,6 @@ Response:`;
                                         <div className="ml-2 w-1 h-1 bg-green-400 rounded-full"></div>
                                     )}
                                 </div>
-                                
-                                {/* Message glow effect */}
                                 <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-30 transition-opacity ${
                                     message.type === 'user' 
                                         ? 'bg-gradient-to-r from-cyan-400 to-blue-400 blur-sm' 
@@ -408,8 +434,6 @@ Response:`;
                             </div>
                         </div>
                     ))}
-                    
-                    {/* Typing Indicator */}
                     {this.state.isTyping && (
                         <div className="flex justify-start">
                             <div className="bg-gray-900/60 backdrop-blur-sm border border-gray-700/50 px-6 py-4 rounded-2xl">
@@ -428,20 +452,17 @@ Response:`;
 
                 {/* Input Area */}
                 <div className="relative z-10 border-t border-gray-800/50 bg-gray-900/20 backdrop-blur-xl p-6">
-                    {/* Quick Questions */}
                     <div className="mb-4 flex flex-wrap gap-2">
                         {this.state.quickQuestions.map((question, index) => (
                             <button
                                 key={index}
-                                onClick={() => this.setState({ inputMessage: question })}
+                                onClick={() => this.setState({ inputMessage: question }, () => this.sendMessage())}
                                 className="text-xs bg-gray-800/40 hover:bg-gray-700/60 text-gray-300 hover:text-white px-3 py-2 rounded-full transition-all duration-300 border border-gray-700/30 hover:border-cyan-400/50 backdrop-blur-sm"
                             >
                                 {question}
                             </button>
                         ))}
                     </div>
-                    
-                    {/* Input Field */}
                     <div className="flex space-x-3">
                         <div className="flex-1 relative">
                             <input
@@ -457,7 +478,6 @@ Response:`;
                                 <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
                             </div>
                         </div>
-                        
                         <button
                             onClick={this.sendMessage}
                             disabled={this.state.isLoading || !this.state.inputMessage.trim()}
@@ -466,13 +486,11 @@ Response:`;
                             {this.state.isLoading ? (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                             ) : (
-                                <span className="font-semibold">Send</span>
+                                <span className="font-semibold">TRANSMIT</span>
                             )}
                             <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity -z-10"></div>
                         </button>
                     </div>
-                    
-                    {/* Status Bar */}
                     <div className="mt-4 flex justify-between items-center text-xs text-gray-500">
                         <div className="flex items-center space-x-4">
                             <div className="flex items-center space-x-2">

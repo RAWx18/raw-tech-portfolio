@@ -102,6 +102,16 @@ const apps = [
         screen: displaySpydr, // Use the component instead of external URL
     },
     {
+        id: "zentoro",
+        title: "Zentoro",
+        icon: './themes/Yaru/apps/zentoro.png',
+        disabled: false,
+        favourite: false,
+        desktop_shortcut: true,
+        isExternalApp: true,
+        url: "https://www.garudexlabs.com/"
+    },
+    {
     id: "socials",
     title: "Social Links",
     icon: './themes/Yaru/system/user-home.png',
@@ -113,3 +123,5 @@ const apps = [
 ]
 
 export default apps;
+
+
