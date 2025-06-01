@@ -5,6 +5,9 @@ export default function LockScreen(props) {
 
     const wallpapers = {
         "wall-0": "./images/wallpapers/spydr_background.png",
+        "wall-1": "./images/wallpapers/lando.jpg",
+        "wall-2": "./images/wallpapers/mclaren.webp",
+        "wall-3": "./images/wallpapers/f1.jpg",
     };
 
     if (props.isLocked) {

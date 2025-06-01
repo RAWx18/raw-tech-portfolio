@@ -12,14 +12,62 @@ export class Terminal extends Component {
         this.prev_commands = [];
         this.commands_index = -1;
         this.child_directories = {
-            root: ["books", "projects", "personal-documents", "skills", "languages", "PDPU", "interests"],
-            PDPU: ["Sem-6"],
-            books: ["Eric-Jorgenson_The-Almanack-of-Naval-Ravikant.pdf", "Elon Musk: How the Billionaire CEO of SpaceX.pdf", "The $100 Startup_CHRIS_GUILLEBEAU.pdf", "The_Magic_of_Thinking_Big.pdf"],
-            skills: ["Front-end development", "React.js", "jQuery", "Flutter", "Express.js", "SQL", "Firebase"],
-            projects: ["RAW9patel-personal-portfolio", "synonyms-list-react", "economist.com-unlocked", "Improve-Codeforces", "flutter-banking-app", "Meditech-Healthcare", "CPU-Scheduling-APP-React-Native"],
-            interests: ["Software Engineering", "Deep Learning", "Computer Vision"],
-            languages: ["Javascript", "C++", "Java", "Dart"],
+            "root": ["goals", "projects", "skills", "languages", "experience", "interests"],
+            "goals": [
+                "Billionaire CEO of some crazy startup",
+                "AI Emperor",
+                "Proud of my parents",
+                "Bending space and time with code"
+            ],
+            "experience": [
+                "NLP Engineer @ AI Plato",
+                "GANs Mentor @ Deeplearning.ai",
+                "Founder @ Garudex Labs - Zentoro",
+                "ML Intern @ DRDO SAG",
+                "LFX @ LFDT",
+            ],
+            "projects": [
+                "RAW-personal-portfolio",
+                "Military Strategy System SHAKTI",
+                "AI Traffic Management",
+                "Quantum Credit Scoring",
+                "Zentoro",
+                "Project Spydr (unreleased)"
+            ],
+            "skills": [
+                "AI development",
+                "Native android development",
+                "DevOps",
+                "Machine Learning Research",
+                "MERN stack"
+            ],
+            "languages": [
+                "Python",
+                "Javascript",
+                "C++",
+                "Java",
+                "React",
+                "Kotlin",
+                "Neo4j",
+                "MySQL"
+            ],
+            "interests": [
+                "AI Agents",
+                "GANs",
+                "Deep Learning",
+                "Machine Learning",
+                "Software Engineering",
+                "Building my own universe"
+            ]
         };
+        
+        // Available commands for tab completion
+        this.available_commands = [
+            "cd", "ls", "pwd", "echo", "clear", "exit", "mkdir", "code", 
+            "spotify", "chrome", "about-RAW", "todoist", "trash", "settings", 
+            "sendmsg", "terminal", "sudo"
+        ];
+        
         this.state = {
             terminal: [],
         }
@@ -70,7 +118,6 @@ export class Terminal extends Component {
                 <div id={`row-result-${id}`} className={"my-2 font-normal"}></div>
             </React.Fragment>
         );
-
     }
 
     focusCursor = (e) => {
@@ -112,8 +159,53 @@ export class Terminal extends Component {
         $(`input#terminal-input-${id}`).trigger("blur");
     }
 
+    // Tab completion function
+    handleTabCompletion = (currentInput, terminal_row_id) => {
+        let words = currentInput.trim().split(' ');
+        let currentWord = words[words.length - 1];
+        let completions = [];
+
+        if (words.length === 1) {
+            // Complete command names
+            completions = this.available_commands.filter(cmd => 
+                cmd.startsWith(currentWord)
+            );
+        } else if (words.length === 2 && (words[0] === 'cd' || words[0] === 'ls')) {
+            // Complete directory/file names for cd and ls commands
+            completions = this.child_directories[this.curr_dir_name].filter(dir => 
+                dir.startsWith(currentWord)
+            );
+        }
+
+        if (completions.length === 1) {
+            // Single match - complete it
+            words[words.length - 1] = completions[0];
+            let newCommand = words.join(' ');
+            
+            $(`input#terminal-input-${terminal_row_id}`).val(newCommand);
+            $(`#show-${terminal_row_id}`).text(newCommand);
+        } else if (completions.length > 1) {
+            // Multiple matches - show all possibilities
+            let result = `<div class="text-gray-300">`;
+            completions.forEach(completion => {
+                result += `<span class="mr-4 text-ubt-blue">${completion}</span>`;
+            });
+            result += `</div>`;
+            
+            // Insert completion options above current line
+            document.getElementById(`row-result-${terminal_row_id}`).innerHTML = result;
+            this.appendTerminalRow();
+        }
+    }
+
     checkKey = (e) => {
-        if (e.key === "Enter") {
+        if (e.key === "Tab") {
+            e.preventDefault(); // Prevent default tab behavior
+            let terminal_row_id = $(e.target).data("row-id");
+            let command = $(`input#terminal-input-${terminal_row_id}`).val();
+            this.handleTabCompletion(command, terminal_row_id);
+        }
+        else if (e.key === "Enter") {
             let terminal_row_id = $(e.target).data("row-id");
             let command = $(`input#terminal-input-${terminal_row_id}`).val().trim();
             if (command.length !== 0) {

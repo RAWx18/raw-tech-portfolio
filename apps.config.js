@@ -7,6 +7,8 @@ import { displayTrash } from './components/apps/trash';
 import { displayGedit } from './components/apps/gedit';
 import { displayAboutVivek } from './components/apps/vivek';
 import { displayTerminalCalc } from './components/apps/calc';
+import { displaySocials } from './components/apps/socials';
+import { displaySpydr } from './components/apps/spydr';
 
 const apps = [
     {
@@ -91,26 +93,23 @@ const apps = [
         screen: displayGedit,
     },
     {
-        id: "github",
-        title: "GitHub",
-        icon: './themes/Yaru/apps/github.png',
-        disabled: false,
-        favourite: false,
-        desktop_shortcut: true,
-        isExternalApp: true,
-        url: "https://github.com/RAWx18",
-        screen: () => {},
-    },
-    {
-        id: "Spydr",
+        id: "spydr",
         title: "Ask Spydr",
         icon: './themes/Yaru/apps/spydr_ai.png',
         disabled: false,
-        favourite: false,
+        favourite: true,
         desktop_shortcut: true,
-        isExternalApp: true,
-        url: "https://www.garudexlabs.com/"
+        screen: displaySpydr, // Use the component instead of external URL
     },
+    {
+    id: "socials",
+    title: "Social Links",
+    icon: './themes/Yaru/system/user-home.png',
+    disabled: false,
+    favourite: false,
+    desktop_shortcut: true,
+    screen: displaySocials,
+},
 ]
 
 export default apps;

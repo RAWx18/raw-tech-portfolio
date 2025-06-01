@@ -8,38 +8,42 @@ export class AboutVivek extends Component {
         this.screens = {};
         this.state = {
             screen: () => { },
-            active_screen: "about", // by default 'about' screen is active
+            active_screen: "portfolio", // default to portfolio screen
             navbar: false,
         }
     }
 
     componentDidMount() {
         this.screens = {
+            "portfolio": <Portfolio />,
             "about": <About />,
-            "education": <Education />,
-            "skills": <Skills />,
+            "secrets": <Secrets />,
             "projects": <Projects />,
-            "resume": <Resume />,
         }
 
         let lastVisitedScreen = localStorage.getItem("about-section");
         if (lastVisitedScreen === null || lastVisitedScreen === undefined) {
-            lastVisitedScreen = "about";
+            lastVisitedScreen = "portfolio";
         }
 
-        // focus last visited screen
-        this.changeScreen(document.getElementById(lastVisitedScreen));
+        // Set initial screen
+        this.setState({
+            screen: this.screens[lastVisitedScreen],
+            active_screen: lastVisitedScreen
+        });
     }
 
     changeScreen = (e) => {
-        const screen = e.id || e.target.id;
+        // Fix the null reference error
+        const screen = e?.id || e?.target?.id;
+        
+        if (!screen) return;
 
         // store this state
         localStorage.setItem("about-section", screen);
 
         // google analytics
         ReactGA.send({ hitType: "pageview", page: `/${screen}`, title: "Custom Title" });
-
 
         this.setState({
             screen: this.screens[screen],
@@ -54,28 +58,21 @@ export class AboutVivek extends Component {
     renderNavLinks = () => {
         return (
             <>
+                <div id="portfolio" tabIndex="0" onFocus={this.changeScreen} className={(this.state.active_screen === "portfolio" ? " bg-ub-orange bg-opacity-100 hover:bg-opacity-95" : " hover:bg-gray-50 hover:bg-opacity-5 ") + " w-28 md:w-full md:rounded-none rounded-sm cursor-default outline-none py-1.5 focus:outline-none duration-100 my-0.5 flex justify-start items-center pl-2 md:pl-2.5"}>
+                    <img className=" w-3 md:w-4" alt="RAW portfolio" src="./themes/Yaru/status/projects.svg" />
+                    <span className=" ml-1 md:ml-2 text-gray-50 ">Portfolio</span>
+                </div>
                 <div id="about" tabIndex="0" onFocus={this.changeScreen} className={(this.state.active_screen === "about" ? " bg-ub-orange bg-opacity-100 hover:bg-opacity-95" : " hover:bg-gray-50 hover:bg-opacity-5 ") + " w-28 md:w-full md:rounded-none rounded-sm cursor-default outline-none py-1.5 focus:outline-none duration-100 my-0.5 flex justify-start items-center pl-2 md:pl-2.5"}>
                     <img className=" w-3 md:w-4" alt="about RAW" src="./themes/Yaru/status/about.svg" />
                     <span className=" ml-1 md:ml-2 text-gray-50 ">About Me</span>
                 </div>
-                <div id="education" tabIndex="0" onFocus={this.changeScreen} className={(this.state.active_screen === "education" ? " bg-ub-orange bg-opacity-100 hover:bg-opacity-95" : " hover:bg-gray-50 hover:bg-opacity-5 ") + " w-28 md:w-full md:rounded-none rounded-sm cursor-default outline-none py-1.5 focus:outline-none duration-100 my-0.5 flex justify-start items-center pl-2 md:pl-2.5"}>
-                    <img className=" w-3 md:w-4" alt="RAW' education" src="./themes/Yaru/status/education.svg" />
-                    <span className=" ml-1 md:ml-2 text-gray-50 ">Education</span>
-                </div>
-                <div id="skills" tabIndex="0" onFocus={this.changeScreen} className={(this.state.active_screen === "skills" ? " bg-ub-orange bg-opacity-100 hover:bg-opacity-95" : " hover:bg-gray-50 hover:bg-opacity-5 ") + " w-28 md:w-full md:rounded-none rounded-sm cursor-default outline-none py-1.5 focus:outline-none duration-100 my-0.5 flex justify-start items-center pl-2 md:pl-2.5"}>
-                    <img className=" w-3 md:w-4" alt="RAW' skills" src="./themes/Yaru/status/skills.svg" />
-                    <span className=" ml-1 md:ml-2 text-gray-50 ">Skills</span>
+                <div id="secrets" tabIndex="0" onFocus={this.changeScreen} className={(this.state.active_screen === "secrets" ? " bg-ub-orange bg-opacity-100 hover:bg-opacity-95" : " hover:bg-gray-50 hover:bg-opacity-5 ") + " w-28 md:w-full md:rounded-none rounded-sm cursor-default outline-none py-1.5 focus:outline-none duration-100 my-0.5 flex justify-start items-center pl-2 md:pl-2.5"}>
+                    <img className=" w-3 md:w-4" alt="RAW secrets" src="./themes/Yaru/status/changes-prevent-symbolic.svg" />
+                    <span className=" ml-1 md:ml-2 text-gray-50 ">Secrets</span>
                 </div>
                 <div id="projects" tabIndex="0" onFocus={this.changeScreen} className={(this.state.active_screen === "projects" ? " bg-ub-orange bg-opacity-100 hover:bg-opacity-95" : " hover:bg-gray-50 hover:bg-opacity-5 ") + " w-28 md:w-full md:rounded-none rounded-sm cursor-default outline-none py-1.5 focus:outline-none duration-100 my-0.5 flex justify-start items-center pl-2 md:pl-2.5"}>
-                    <img className=" w-3 md:w-4" alt="RAW' projects" src="./themes/Yaru/status/projects.svg" />
+                    <img className=" w-3 md:w-4" alt="RAW projects" src="./themes/Yaru/status/projects.svg" />
                     <span className=" ml-1 md:ml-2 text-gray-50 ">Projects</span>
-                </div>
-                <div id="resume" tabIndex="0" onFocus={this.changeScreen} className={(this.state.active_screen === "resume" ? " bg-ub-orange bg-opacity-100 hover:bg-opacity-95" : " hover:bg-gray-50 hover:bg-opacity-5 ") + " w-28 md:w-full md:rounded-none rounded-sm cursor-default outline-none py-1.5 focus:outline-none duration-100 my-0.5 flex justify-start items-center pl-2 md:pl-2.5"}>
-                    <img className=" w-3 md:w-4" alt="RAW's resume" src="./themes/Yaru/status/download.svg" />
-                    <span className=" ml-1 md:ml-2 text-gray-50 ">Resume</span>
-                </div>
-                <div className='my-0.5 w-28 md:w-full h-8 px-2 md:px-2.5 flex' >
-                    <iframe src="https://github.com/sponsors/RAWx18/button" title="Sponsor RAWx18" width={"100%"} height={"100%"} ></iframe>
                 </div>
             </>
         );
@@ -109,124 +106,102 @@ export const displayAboutVivek = () => {
     return <AboutVivek />;
 }
 
+function Portfolio() {
+    const openPortfolio = () => {
+        window.open("https://rawx18.netlify.app", "_blank");
+    };
+
+    return (
+        <div className="w-full h-full flex flex-col bg-white">
+            <div className="flex justify-between items-center p-3 bg-gray-100 border-b">
+                <div className="flex items-center space-x-2">
+                    <div className="flex space-x-1">
+                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    </div>
+                    <span className="text-sm text-gray-600 ml-4">rawx18.netlify.app</span>
+                </div>
+                <button
+                    onClick={openPortfolio}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors flex items-center"
+                >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Open in New Tab
+                </button>
+            </div>
+            <div className="flex-1 relative">
+                <iframe
+                    src="https://rawx18.netlify.app"
+                    className="w-full h-full border-0"
+                    title="RAW Portfolio Website"
+                    loading="lazy"
+                />
+            </div>
+        </div>
+    );
+}
 
 function About() {
     return (
         <>
             <div className="w-20 md:w-28 my-4 bg-white rounded-full">
-                <img className="w-full" src="./images/logos/bitmoji.png" alt="Ryan Logo" />
+                <img className="w-full" src="./images/logos/ryan.jpeg" alt="Ryan Logo" />
             </div>
             <div className=" mt-4 md:mt-8 text-lg md:text-2xl text-center px-1">
-                <div>my name is <span className="font-bold">Ryan</span> ,</div>
-                <div className="font-normal ml-1">I'm a <span className="text-pink-600 font-bold">Frontend Engineer!</span></div>
+                <div>My name is <span className="font-bold">Ryan</span>,</div>
+                <div className="font-normal ml-1">I'm an <span className="text-pink-600 font-bold">AI Engineer!</span></div>
             </div>
             <div className=" mt-4 relative md:my-8 pt-px bg-white w-32 md:w-48">
                 <div className="bg-white absolute rounded-full p-0.5 md:p-1 top-0 transform -translate-y-1/2 left-0"></div>
                 <div className="bg-white absolute rounded-full p-0.5 md:p-1 top-0 transform -translate-y-1/2 right-0"></div>
             </div>
             <ul className=" mt-4 leading-tight tracking-tight text-sm md:text-base w-5/6 md:w-3/4 emoji-list">
-                <li className=" list-pc">I'm a <span className=" font-medium">Graduate Student</span> currently pursuing Computer Science. I've completed my 6 month SWE intern at <u className=' cursor-pointer '> <a href="https://en.wikipedia.org/wiki/HackerRank" target={"_blank"}>HackerRank</a> </u>, and now I'm looking for full-time frontend engineer roles! ( Hit me up <a className='text-underline' href='mailto:rawx18.dev@gmail.com'><u>@rawx18.dev@gmail.com</u></a> :) )</li>
-                <li className=" mt-3 list-building"> I enjoy building awesome softwares that solve practical problems.</li>
-                <li className=" mt-3 list-time"> When I am not coding my next project, I like to spend my time reading books, playing minecraft or watching <a href="https://www.youtube.com/channel/UCBa659QWEk1AI4Tg--mrJ2A" target="_blank" rel="noreferrer"> tom scott's videos.</a></li>
-                <li className=" mt-3 list-star"> And I also have interest in Deep Learning & Computer Vision!</li>
+                <li className=" list-pc">I'm an <span className=" font-medium">undergraduate student</span> currently pursuing a BTech in Computer Science at IIIT Gwalior. I've completed several internships - check them out in my portfolio! I don't want to repeat information here since this is just a fun, psycho-crazy techie version of my portfolio. For the main portfolio, visit <a href="https://rawx18.netlify.app" target="_blank" className="text-blue-400 underline">rawx18.netlify.app</a>. (Feel free to connect with me at <a className='text-underline' href='mailto:rawx18.dev@gmail.com'><u>rawx18.dev@gmail.com</u></a> :) )</li>
+                <li className=" mt-3 list-building">I enjoy building awesome software that solves practical problems, especially those involving cutting-edge technologies like AI.</li>
             </ul>
         </>
     )
 }
-function Education() {
+
+function Secrets() {
     return (
         <>
             <div className=" font-medium relative text-2xl mt-2 md:mt-4 mb-4">
-                Education
+                🤫 Secrets & Fun Facts
                 <div className="absolute pt-px bg-white mt-px top-full w-full">
                     <div className="bg-white absolute rounded-full p-0.5 md:p-1 top-0 transform -translate-y-1/2 left-full"></div>
                     <div className="bg-white absolute rounded-full p-0.5 md:p-1 top-0 transform -translate-y-1/2 right-full"></div>
                 </div>
             </div>
-            <ul className=" w-10/12  mt-4 ml-4 px-0 md:px-1">
-                <li className="list-disc">
-                    <div className=" text-lg md:text-xl text-left font-bold leading-tight">
-                        Arizona State University
-                    </div>
-                    <div className=" text-sm text-gray-400 mt-0.5">2022 - 2024</div>
-                    <div className=" text-sm md:text-base">Computer Science</div>
-                    <div className="text-sm text-gray-300 font-bold mt-1">GPA &nbsp; 4.0/4.0</div>
-                </li>
-                <li className="list-disc">
-                    <div className=" text-lg md:text-xl mt-4 text-left font-bold leading-tight">
-                        Pandit Deendayal Energy University - PDEU
-                    </div>
-                    <div className=" text-sm text-gray-400 mt-0.5">2018 - 2022</div>
-                    <div className=" text-sm md:text-base">Computer Engineering</div>
-                    <div className="text-sm text-gray-300 font-bold mt-1">CGPA &nbsp; 9.35/10</div>
-                </li>
-                <li className="list-disc mt-5">
-                    <div className=" text-lg md:text-xl text-left font-bold leading-tight">
-                        Class 12<sup>th</sup>
-                    </div>
-                    <div className=" text-sm text-gray-400 mt-0.5">2016 - 2018</div>
-                    <div className=" text-sm md:text-base">Maths, Physics, Chemistry</div>
-                    <div className="text-sm text-gray-300 font-bold mt-1">Percentile Rank &nbsp; 94.1%</div>
-                </li>
-            </ul>
-        </>
-    )
-}
-function Skills() {
-    return (
-        <>
-            <div className=" font-medium relative text-2xl mt-2 md:mt-4 mb-4">
-                Technical Skills
-                <div className="absolute pt-px bg-white mt-px top-full w-full">
-                    <div className="bg-white absolute rounded-full p-0.5 md:p-1 top-0 transform -translate-y-1/2 left-full"></div>
-                    <div className="bg-white absolute rounded-full p-0.5 md:p-1 top-0 transform -translate-y-1/2 right-full"></div>
+            <div className="w-10/12 space-y-6">
+                <div className="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                    <h3 className="text-lg font-bold text-yellow-400 mb-2">🎬 Movies/Series Addiction</h3>
+                    <p className="text-sm text-gray-300">I might have spent over 1000+ hours watching sci-fi, disaster, success stories, and time-travel related movies and series. Don't judge me! 😅</p>
+                </div>
+                
+                <div className="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                    <h3 className="text-lg font-bold text-blue-400 mb-2">🚀 Hidden Project</h3>
+                    <p className="text-sm text-gray-300">Project Spydr is my secret AI assistant that I'm building. It's still in stealth mode, but it might just revolutionize how we interact with code! 🤖</p>
+                </div>
+                
+                <div className="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                    <h3 className="text-lg font-bold text-green-400 mb-2">💼 Zentoro - My Emotional Startup</h3>
+                    <p className="text-sm text-gray-300">Zentoro might be just another startup to others, but for me, it means everything. It's really close to my heart and represents my entrepreneurial dreams.</p>
+                </div>
+                
+                <div className="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                    <h3 className="text-lg font-bold text-purple-400 mb-2">🎯 Ultimate Goal</h3>
+                    <p className="text-sm text-gray-300">Beyond being a billionaire CEO, I secretly want to create the first AI that can replicate JARVIS. I want to be Iron Man, but honestly, Batman would work too! 🦸‍♂️</p>
+                </div>
+                
+                <div className="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                    <h3 className="text-lg font-bold text-red-400 mb-2">💻 Love for Coding</h3>
+                    <p className="text-sm text-gray-300">I love getting into "the zone" - locking myself away from distractions just to build something crazy and innovative! 😏</p>
                 </div>
             </div>
-            <ul className=" tracking-tight text-sm md:text-base w-10/12 emoji-list">
-                <li className=" list-arrow text-sm md:text-base mt-4 leading-tight tracking-tight">
-                    I've worked with a wide variety of programming languages & frameworks.
-                </li>
-                <li className=" list-arrow text-sm md:text-base mt-4 leading-tight tracking-tight">
-                    <div> My areas of expertise are <strong className="text-ubt-gedit-orange">front-end development, React.js & javascript!</strong></div>
-                </li>
-                <li className=" list-arrow text-sm md:text-base mt-4 leading-tight tracking-tight">
-                    <div>Here are my most frequently used</div>
-                </li>
-            </ul>
-            <div className="w-full md:w-10/12 flex mt-4">
-                <div className=" text-sm text-center md:text-base w-1/2 font-bold">Languages & Tools</div>
-                <div className=" text-sm text-center md:text-base w-1/2 font-bold">Frameworks & Libraries</div>
-            </div>
-            <div className="w-full md:w-10/12 flex justify-center items-start font-bold text-center">
-                <div className="px-2 w-1/2">
-                    <div className="flex flex-wrap justify-center items-start w-full mt-2">
-                        <img className="m-1" src="https://img.shields.io/badge/-JavaScript-%23F7DF1C?style=flat&logo=javascript&logoColor=000000&labelColor=%23F7DF1C&color=%23FFCE5A" alt="RAW javascript" />
-                        <img className="m-1" src="https://img.shields.io/badge/C%2B%2B-00599C?style=flat&logo=c%2B%2B&logoColor=white" alt="RAW c++" />
-                        <img className="m-1" src="http://img.shields.io/badge/-Python-3776AB?style=flat&logo=python&logoColor=ffffff" alt="RAW python" />
-                        <img className="m-1" src="https://img.shields.io/badge/Dart-0175C2?style=flat&logo=dart&logoColor=white" alt="RAW dart" />
-                        <a href="https://www.google.com/search?q=is+html+a+language%3F" target="_blank" rel="noreferrer"><img title="yes it's a language!" className="m-1" src="https://img.shields.io/badge/-HTML5-%23E44D27?style=flat&logo=html5&logoColor=ffffff" alt="RAW HTML" /></a>
-                        <img src="https://img.shields.io/badge/-Sass-%23CC6699?style=flat&logo=sass&logoColor=ffffff" alt="RAW SASS" className="m-1" />
-                        <img src="https://img.shields.io/badge/-Git-%23F05032?style=flat&logo=git&logoColor=%23ffffff" alt="RAW git" className="m-1" />
-                        <img src="https://img.shields.io/badge/-Firebase-FFCA28?style=flat&logo=firebase&logoColor=ffffff" alt="RAW firebase" className="m-1" />
-                    </div>
-                </div>
-                <div className="px-2 flex flex-wrap items-start w-1/2">
-                    <div className="flex flex-wrap justify-center items-start w-full mt-2">
-                        <img className=" m-1" src="https://img.shields.io/badge/Next-black?style=flat&logo=next.js&logoColor=ffffff" alt="RAW next" />
-                        <img className=" m-1" src="https://img.shields.io/badge/-React-61DAFB?style=flat&logo=react&logoColor=ffffff" alt="RAW react" />
-                        <img className="m-1" src="https://img.shields.io/badge/Flutter-02569B?style=flat&logo=flutter&logoColor=white" alt="RAW flutter" />
-                        <img className="m-1" src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white" alt="RAW tailwind css" />
-                        <img src="https://img.shields.io/badge/-Nodejs-339933?style=flat&logo=Node.js&logoColor=ffffff" alt="RAW node.js" className="m-1" />
-                        <img src="https://img.shields.io/badge/jQuery-0769AD?style=flat&logo=jquery&logoColor=white" alt="RAW jquery" className="m-1" />
-                        <img className="m-1" src="https://img.shields.io/badge/Redux-593D88?style=flat&logo=redux&logoColor=white" alt="RAW redux" />
-                    </div>
-                </div>
-            </div>
-            <ul className=" tracking-tight text-sm md:text-base w-10/12 emoji-list mt-4">
-                <li className=" list-arrow text-sm md:text-base mt-4 leading-tight tracking-tight">
-                    <span> And of course,</span> <img className=" inline ml-1" src="http://img.shields.io/badge/-Linux-0078D6?style=plastic&logo=linux&logoColor=ffffff" alt="RAW linux" /> <span>!</span>
-                </li>
-            </ul>
         </>
     )
 }
@@ -234,154 +209,109 @@ function Skills() {
 function Projects() {
     const project_list = [
         {
-            name: "UbuntuOS Portfolio",
-            date: "Apr 2021",
-            link: "https://github.com/RAWx18/RAWx18.github.io",
+            name: "SpydrOS Portfolio",
+            date: "Jun 2025",
+            link: "https://github.com/RAWx18/raw-tech-portfolio",
             description: [
-                "Personal portfolio website of theme Ubuntu 20.04, made using NEXT.js & tailwind CSS",
+                "Ubuntu-inspired portfolio OS built with React & Tailwind CSS. Features terminal emulation, authentication system, and interactive desktop environment.",
             ],
-            domains: ["javascript", "next.js", "tailwindcss"]
+            domains: ["react", "tailwindcss", "ubuntu", "portfolio"]
         },
         {
-            name: "Chrome Extension React Bolierplate",
-            date: "Dec 2021",
-            link: "https://github.com/RAWx18/chrome-extension-react-boilerplate",
+            name: "AI Traffic Management System",
+            date: "Mar 2024",
+            link: "https://github.com/RAWx18",
             description: [
-                "A boilerplate code to build a chrome extension with react and webpack",
+                "Intelligent traffic optimization system using computer vision and machine learning to reduce congestion in smart cities.",
             ],
-            domains: ["javascript", "chrome-extension"]
+            domains: ["python", "opencv", "tensorflow", "ai"]
         },
         {
-            name: "CodeConnect",
-            date: "Nov 2021",
-            link: "https://github.com/RAWx18/CodeConnect-frontend",
+            name: "Quantum Credit Scoring",
+            date: "Jan 2024",
+            link: "https://github.com/RAWx18",
             description: [
-                "A multi-language pair-programming platform with the features of video meeting and whiteboard. Built with React.js, Tailwind CSS, Chakra UI, Express & Socket.io.",
+                "Revolutionary credit scoring system leveraging quantum computing principles for enhanced financial risk assessment.",
             ],
-            domains: ["javascript", "tailwindcss"]
+            domains: ["quantum", "finance", "machine-learning"]
         },
         {
-            name: "Ad Free Spotify",
-            date: "Jun 2021",
-            link: "https://github.com/RAWx18/ad-free-spotify",
+            name: "Zentoro Platform",
+            date: "Dec 2023",
+            link: "https://github.com/RAWx18/Zentoro",
             description: [
-                "Chrome extension to automatically mute/unmute Spotify tab when Advertisement starts and ends!",
+                "Full-stack web platform for digital transformation with microservices architecture and real-time analytics dashboard.",
             ],
-            domains: ["javascript", "chrome-extension"]
+            domains: ["react", "node.js", "microservices", "analytics"]
         },
         {
-            name: "economist.com Unlocked",
-            date: "Mar 2021",
-            link: "https://github.com/RAWx18/economist.com-unlocked",
+            name: "Real-time Chat Application",
+            date: "Jun 2023",
+            link: "https://github.com/RAWx18",
             description: [
-                "A chrome extension to read Paid Articles for Free & with no Ads, no subscription, no memberships!",
+                "Scalable real-time messaging platform with end-to-end encryption, file sharing, and group video calls.",
             ],
-            domains: ["javascript", "chrome-extension"]
-        },
-        {
-            name: "Flutter banking app",
-            date: "Jan 2021",
-            link: "https://github.com/RAWx18/flutter-banking-app",
-            description: [
-                "A Flutter & Firebase project for creating transactions between different Users and displaying the history of transactions done by all.",
-            ],
-            domains: ["flutter", "firestore", "dart", "firebase auth"]
-        },
-        {
-            name: "CPU scheduling application",
-            date: "Dec 2020",
-            link: "https://github.com/RAWx18/CPU-Scheduling-APP-React-Native",
-            description: [
-                "React Native Application to visualize the CPU Scheduling algorithms with different Processes and Animations with gannt chart.",
-            ],
-            domains: ["react-native", "javascript"]
-        },
-        {
-            name: "Meditech Healthcare WebApp",
-            date: "Nov 2020",
-            link: "https://github.com/RAWx18/Meditech-Healthcare",
-            description: [
-                "Developed Web Application to predict and diagnose diseases from x-ray images.",
-            ],
-            domains: ["javascript", "html5", "sass", "firebase", "tensorflow"]
-        },
-        {
-            name: "Problem Recommendation System",
-            date: "Sep 2020",
-            link: "https://github.com/RAWx18/Improve-Codeforces",
-            description: [
-                "Django web application to suggest practice problems from the areas in which the user struggles to get pass in code-forces.",
-            ],
-            domains: ["django", "python", "codeforces-api", "javascript"]
-        },
-        {
-            name: "Cleanliness Automation",
-            date: "Dec 2019",
-            link: "https://github.com/RAWx18/CPU-Scheduling-APP-React-Native",
-            description: [
-                "Developed Web Applications to automate Garbage collection and extraction systems for SSIP hackathon",
-            ],
+            domains: ["websockets", "encryption", "webrtc", "react"]
         }
     ];
 
     const tag_colors = {
-        "javascript": "yellow-300",
-        "firebase": "red-600",
-        "firestore": "red-500",
-        "firebase auth": "red-400",
-        "chrome-extension": "yellow-400",
-        "flutter": "blue-400",
-        "dart": "blue-500",
-        "react-native": "purple-500",
-        "html5": "pink-600",
-        "sass": "pink-400",
-        "tensorflow": "yellow-600",
-        "django": "green-600",
-        "python": "green-200",
-        "codeforces-api": "gray-300",
+        "react": "blue-400",
         "tailwindcss": "blue-300",
-        "next.js": "purple-600"
+        "ubuntu": "orange-500",
+        "portfolio": "purple-400",
+        "python": "green-400",
+        "opencv": "red-400",
+        "tensorflow": "yellow-500",
+        "ai": "purple-600",
+        "quantum": "pink-500",
+        "finance": "green-600",
+        "machine-learning": "blue-600",
+        "node.js": "green-500",
+        "microservices": "gray-400",
+        "analytics": "indigo-400",
+        "iot": "cyan-400",
+        "raspberry-pi": "red-500",
+        "ml": "purple-500",
+        "websockets": "yellow-400",
+        "encryption": "red-600",
+        "webrtc": "blue-500"
     }
 
     return (
         <>
             <div className=" font-medium relative text-2xl mt-2 md:mt-4 mb-4">
-                Projects
+                Latest Projects
                 <div className="absolute pt-px bg-white mt-px top-full w-full">
                     <div className="bg-white absolute rounded-full p-0.5 md:p-1 top-0 transform -translate-y-1/2 left-full"></div>
                     <div className="bg-white absolute rounded-full p-0.5 md:p-1 top-0 transform -translate-y-1/2 right-full"></div>
                 </div>
             </div>
-            <iframe src="https://github.com/sponsors/RAWx18/card" title="Sponsor RAWx18" className='my-4 w-5/6 md:w-3/4' ></iframe>
 
             {
                 project_list.map((project, index) => {
-                    const projectNameFromLink = project.link.split('/')
-                    const projectName = projectNameFromLink[projectNameFromLink.length - 1]
                     return (
                         <a key={index} href={project.link} target="_blank" rel="noreferrer" className="flex w-full flex-col px-4">
-                            <div className="w-full py-1 px-2 my-2 border border-gray-50 border-opacity-10 rounded hover:bg-gray-50 hover:bg-opacity-5 cursor-pointer">
+                            <div className="w-full py-3 px-4 my-2 border border-gray-50 border-opacity-10 rounded hover:bg-gray-50 hover:bg-opacity-5 cursor-pointer transition-all">
                                 <div className="flex flex-wrap justify-between items-center">
                                     <div className='flex justify-center items-center'>
-                                        <div className=" text-base md:text-lg mr-2">{project.name.toLowerCase()}</div>
-                                        <iframe src={`https://ghbtns.com/github-btn.html?user=RAWx18&repo=${projectName}&type=star&count=true`} frameBorder="0" scrolling="0" width="150" height="20" title={project.name.toLowerCase()+"-star"}></iframe>
+                                        <div className=" text-base md:text-lg mr-2 font-semibold">{project.name}</div>
                                     </div>
                                     <div className="text-gray-300 font-light text-sm">{project.date}</div>
                                 </div>
-                                <ul className=" tracking-normal leading-tight text-sm font-light ml-4 mt-1">
+                                <ul className=" tracking-normal leading-tight text-sm font-light ml-4 mt-2">
                                     {
                                         project.description.map((desc, index) => {
                                             return <li key={index} className="list-disc mt-1 text-gray-100">{desc}</li>;
                                         })
                                     }
                                 </ul>
-                                <div className="flex flex-wrap items-start justify-start text-xs py-2">
+                                <div className="flex flex-wrap items-start justify-start text-xs py-2 mt-2">
                                     {
                                         (project.domains ?
                                             project.domains.map((domain, index) => {
-                                                return <span key={index} className={`px-1.5 py-0.5 w-max border border-${tag_colors[domain]} text-${tag_colors[domain]} m-1 rounded-full`}>{domain}</span>
+                                                return <span key={index} className={`px-2 py-1 w-max border border-${tag_colors[domain]} text-${tag_colors[domain]} m-1 rounded-full bg-opacity-10 bg-${tag_colors[domain]}`}>{domain}</span>
                                             })
-
                                             : null)
                                     }
                                 </div>
@@ -391,10 +321,5 @@ function Projects() {
                 })
             }
         </>
-    )
-}
-function Resume() {
-    return (
-        <iframe className="h-full w-full" src="./files/RAW-Resume.pdf" title="Ryan resume" frameBorder="0"></iframe>
     )
 }
