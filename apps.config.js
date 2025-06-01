@@ -104,7 +104,7 @@ const apps = [
     {
         id: "Spydr",
         title: "Ask Spydr",
-        icon: './themes/Yaru/apps/tars.svg',
+        icon: './themes/Yaru/apps/spydr_ai.png',
         disabled: false,
         favourite: false,
         desktop_shortcut: true,

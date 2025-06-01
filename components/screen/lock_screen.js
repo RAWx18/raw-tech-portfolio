@@ -4,7 +4,7 @@ import Clock from '../util components/clock';
 export default function LockScreen(props) {
 
     const wallpapers = {
-        "wall-6": "./images/wallpapers/wall-6.webp",
+        "wall-0": "./images/wallpapers/spydr_background.png",
     };
 
     if (props.isLocked) {

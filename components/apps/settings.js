@@ -3,7 +3,7 @@ import $ from 'jquery';
 
 export function Settings(props) {
     const wallpapers = {
-        "wall-6": "./images/wallpapers/wall-6.webp",
+        "wall-0": "./images/wallpapers/spydr_background.png",
     };
 
     let changeBackgroundImage = (e) => {
