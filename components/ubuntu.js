@@ -6,19 +6,30 @@ import Navbar from './screen/navbar';
 import ReactGA from 'react-ga4';
 
 export default class Ubuntu extends Component {
-	constructor() {
-		super();
-		this.state = {
-			screen_locked: false,
-			bg_image_name: 'wall-0',
-			booting_screen: true,
-			shutDownScreen: false
-		};
-	}
+    constructor() {
+        super();
+        this.state = {
+            screen_locked: true,
+            bg_image_name: 'wall-2',
+            booting: true,
+            shutDownScreen: false
+        }
+    }
 
-	componentDidMount() {
-		this.getLocalData();
-	}
+    componentDidMount() {
+        // Always start with lock screen when page is loaded
+        this.setState({ booting: false });
+        localStorage.setItem('screen-locked', true);
+
+        if (typeof window !== 'undefined') {
+            // Add event listeners for unlocking
+            window.addEventListener('click', this.unLockScreen);
+            window.addEventListener('keypress', this.unLockScreen);
+        }
+
+        // Google Analytics
+        ReactGA.send({ hitType: "pageview", page: "/lock-screen", title: "Lock Screen" });
+    }
 
 	setTimeOutBootScreen = () => {
 		setTimeout(() => {

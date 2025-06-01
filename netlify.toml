@@ -22,7 +22,7 @@
 # You can set a specific LTS version supported by Netlify.
 [build.environment]
   NODE_VERSION = "18"
-  NEXT_PUBLIC_TRACKING_ID = "G-XXXXXXXXXX"  # Replace with your actual GA4 ID
+  NEXT_PUBLIC_TRACKING_ID = "G-XXXXXXXXXX"
 
   # Environment variables:
   # You can set your NEXT_PUBLIC_ environment variables here if they are not sensitive,
